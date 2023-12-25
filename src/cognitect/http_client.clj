@@ -26,9 +26,7 @@
                                  Response$CompleteListener Response$HeadersListener Response$ContentListener
                                  Response$FailureListener]
    [org.eclipse.jetty.client.util ByteBufferContentProvider]
-   [org.eclipse.jetty.http HttpFields]
-   [org.eclipse.jetty.util.resource Resource]
-   org.eclipse.jetty.util.ssl.SslContextFactory))
+   [org.eclipse.jetty.http HttpFields]))
 
 (set! *warn-on-reflection* true)
 
@@ -274,23 +272,6 @@ On error, response map is per cognitect.anomalies"
          (swap! pending-ops dec))))
    ch))
 
-(defn ssl-context-factory
-  ^SslContextFactory [{:keys [classpath-trust-store trust-store-password trust-store validate-hostnames]
-                       :or {validate-hostnames true}}]
-  (let [factory (SslContextFactory. false)]
-    (if validate-hostnames
-      (.setEndpointIdentificationAlgorithm factory "HTTPS")
-      ;; Default changed in 9.4.15
-      ;; https://github.com/eclipse/jetty.project/issues/3466
-      (.setEndpointIdentificationAlgorithm factory nil))
-    (when trust-store
-      (.setTrustStore factory trust-store))
-    (when classpath-trust-store
-      (.setTrustStoreResource factory (Resource/newClassPathResource classpath-trust-store)))
-    (when trust-store-password
-      (.setTrustStorePassword factory trust-store-password))
-    factory))
-
 (defn create
   "Creates an http-client that can be used with submit. Takes a config map with
    the following keys:
@@ -322,7 +303,7 @@ On error, response map is per cognitect.anomalies"
            pending-ops-limit 64}
     :as   config}]
   ;(configure-jetty-announce)
-  (let [jetty-client (doto (HttpClient. (ssl-context-factory config))
+  (let [jetty-client (doto (HttpClient.)
                        (.setFollowRedirects follow-redirects)
                        (.setAddressResolutionTimeout resolve-timeout)
                        (.setConnectTimeout connect-timeout)
