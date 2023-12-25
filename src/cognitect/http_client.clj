@@ -28,19 +28,18 @@
    [org.eclipse.jetty.client.util ByteBufferContentProvider]
    [org.eclipse.jetty.http HttpFields]
    [org.eclipse.jetty.util.resource Resource]
-   [org.eclipse.jetty.util.log Log]
    org.eclipse.jetty.util.ssl.SslContextFactory))
 
 (set! *warn-on-reflection* true)
 
 ;; Disable Jetty announce by default
-(defn configure-jetty-announce
-  "Set Jetty announce to false by default unless specified as a system property.
-   Jetty defaults this setting is true"
-  []
-  (doto (Log/getProperties)
-    (.setProperty "org.eclipse.jetty.util.log.announce"
-                  (System/getProperty "org.eclipse.jetty.util.log.announce" "false"))))
+;(defn configure-jetty-announce
+;  "Set Jetty announce to false by default unless specified as a system property.
+;   Jetty defaults this setting is true"
+;  []
+;  (doto (Log/getProperties)
+;    (.setProperty "org.eclipse.jetty.util.log.announce"
+;                  (System/getProperty "org.eclipse.jetty.util.log.announce" "false"))))
 
 ;; begin copied from datomic.java.io.bbuf ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn empty-bbuf
@@ -322,7 +321,7 @@ On error, response map is per cognitect.anomalies"
            min-threads 8
            pending-ops-limit 64}
     :as   config}]
-  (configure-jetty-announce)
+  ;(configure-jetty-announce)
   (let [jetty-client (doto (HttpClient. (ssl-context-factory config))
                        (.setFollowRedirects follow-redirects)
                        (.setAddressResolutionTimeout resolve-timeout)
